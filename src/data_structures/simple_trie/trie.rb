@@ -1,7 +1,7 @@
 class Trie
   
   class Node
-    attr_reader :chars
+    attr_reader :chars, :data, :count
 
     def initialize()
       @chars = {}
@@ -13,10 +13,12 @@ class Trie
     end
 
     def mark_word(&block)
+      @count ||= 0
+      @count += 1
       @is_word = true
       @data = @data || {}
       if block_given?
-        yield @data
+        yield @data, @count
       end
     end
     
@@ -75,17 +77,16 @@ class Trie
   end
 
 
-  def auto_complete(word)
-  
+  def auto_complete(word) 
     prefix_node = find(word)
     if prefix_node
       words_from(prefix_node, word)
     end
 
   end
-  
+
   def to_s
-    self.words
+    self.words.to_s
   end
 
   private
@@ -108,10 +109,11 @@ class Trie
         new_prefix = memo[:prefix] + char
 
         if node.is_word?
-          words.push(new_prefix)
+          words.push({word: new_prefix, data: node.data, count: node.count })
         end
         {words: words, prefix: new_prefix}
       end
+
       begin
         start = { words: [], prefix: prefix }
         result = node.traverse_chars(start, &iter)

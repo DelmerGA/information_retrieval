@@ -30,32 +30,14 @@ class BSTree
   end
 
   def include?(val)
-    compare = Proc.new do |node|
-      node.val < val
-    end
-    matcher = Proc.new {|n| n.val == val }
-    !find(compare, matcher).nil?
+   !find(compare, matcher).nil?
   end
 
   def remove(val)
   end
   
   private
-     def cust_find(compare, matcher)
-      current_node = @root
-      until current_node.nil?
-        if compare.call(current_node)
-            current_node = current_node.right
-        else
-          current_node = current_node.left
-        end
-        p current_node
-        if current_node && matcher.call(current_node)
-          return current_node
-        end
-      end
-    end
-
+    
     def find(val)
       current_node = @root
       until current_node.nil?

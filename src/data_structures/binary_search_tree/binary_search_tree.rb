@@ -1,6 +1,6 @@
 class BSTree
   
-  class Node < Struct.new(:val, :left, :right)
+  class Node < Struct.new(:val,:data, :left, :right)
     def method_missing (m, *args, &block)
       val.method(m).call(*args, &block)
     end
@@ -12,7 +12,7 @@ class BSTree
   end
 
 
-  def insert(new_val)
+  def insert(new_val, data=nil)
     current_node = @root
     
     until current_node.val.nil?
@@ -26,11 +26,17 @@ class BSTree
     end
 
     current_node.val = new_val
+    current_node.data = data
     self
   end
 
   def include?(val)
-   !find(compare, matcher).nil?
+   !find(val).nil?
+  end
+
+  def [](char)
+    node = find(val)
+    node.nil? nil: node,data
   end
 
   def remove(val)

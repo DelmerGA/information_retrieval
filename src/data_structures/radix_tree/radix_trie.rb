@@ -1,13 +1,19 @@
+require_relative("../binary_search_tree/binary_search_tree.rb")
 class Radix
   class Node
     attr_accessor :chars
     def initialize
-      @chars = []
+      @chars = BSTree.new
     end
 
     def []=(char, other)
-      
+      @chars.insert(char, {data: other})
     end
+    
+    def [](char)
+      @chars[char]
+    end
+    private
 
 
       def insert_index(char, char_list, start, last)

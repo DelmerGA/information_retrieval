@@ -14,6 +14,93 @@ class BSTree
     @root = Node.new
   end
 
+  def start(frame, &block)
+    @stack ||= []
+    @stack.push(frame)
+    if block
+      until @stack.empty?
+        result = block.call(complete)
+        @stack.last[:result] = result
+      end
+    end
+  end
+
+  def complete
+    @stack ||= []
+    @stack.pop
+  end
+
+  def new_first(&block)
+    start({node: @root, count: 0}) do |frame|
+      node = frame[:node]
+      count = frame[:count]
+
+      if node
+        if count == 0
+          start({node: node.left, count: 0 })
+        elsif count == 1
+          frame[:count] = 2
+          start(frame)
+          start({node: node.right, count: 0})
+        else
+          block.call(complete)
+        end
+      else
+        next_frame = complete
+        if next_frame 
+          next_frame[:count] = 2
+          start(next_frame)
+        end
+      end
+    end
+  end
+
+  def depth_first(&block)
+    stack = [{node: @root, side: 1}]
+    until stack.empty?
+      current = stack.pop
+      yield current[:node]
+      unless current[:node].nil?
+        if current[:side] == 1
+          stack.push current
+          stack.push({node: current[:node].left, side: 1})
+        elsif current[:side] == 2
+          stack.push({node: current[:node].right, side: 1})
+        else
+          yield stack.pop[:node]
+        end
+      else
+        next_node = stack.last
+        if next_node
+          next_node[:side] += 1
+        end
+      end
+    end
+  end
+
+  def each_order(&block)
+    stack = [{node: @root, side: 1}]
+    until stack.empty?
+      current = stack.pop
+      unless current[:node].nil?
+        if current[:side] == 1
+          stack.push current
+          stack.push({node: current[:node].left, side: 1})
+        elsif current[:side] == 2
+          block.call(current[:node].val)
+          stack.push({node: current[:node].right, side: 1})
+        else
+          block.call(stack.pop.val)
+        end
+      else
+        next_node = stack.last
+        if next_node
+          next_node[:side] += 1
+        end
+      end
+    end
+  end
+
   def to_a
     arr = []
     stack = [{node: @root, side: 1}]
